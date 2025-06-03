@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Page - XYZ.com</title>
+    <style>
+        /* Basic Reset & Globals */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background-color: #f0f2f5; /* A slightly different background */
+            color: #1c1e21; /* Darker text for better contrast */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .page-header, .page-footer {
+            background-color: #1877f2; /* A distinct header/footer color, e.g., Facebook blue */
+            color: #fff;
+            padding: 1em 0;
+            text-align: center;
+        }
+        .page-header h1, .page-footer p {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        main {
+            flex-grow: 1; /* Allows main to fill available space */
+            max-width: 760px;
+            width: 90%; /* Responsive width */
+            margin: 25px auto;
+            padding: 25px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        /* Content Area Styling */
+        .content-block {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        #user-content {
+            background-color: #e7f3ff; /* Light, calm blue */
+            border: 1px solid #cce0f5;
+        }
+        #user-content h2 {
+            color: #00529b;
+        }
+
+        #social-exclusive-content {
+            background-color: #fffbe2; /* Warm, inviting yellow */
+            border: 1px solid #ffe8a1;
+            border-left: 5px solid #ffc107; /* Accent color */
+        }
+        #social-exclusive-content h2 {
+            color: #856404;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Basic responsive adjustments */
+        @media (max-width: 600px) {
+            main {
+                padding: 15px;
+                margin: 15px auto;
+            }
+            .page-header h1, .page-footer p {
+                font-size: 0.9em;
+            }
+            .content-block h2 {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <h1>title</h1>
+    </header>
+
+    <main>
+        <div id="user-content" class="content-block hidden">
+            <h2>Regular Content for Our Valued Site Visitors</h2>
+            <p>This is the standard content experience for users navigating within XYZ.com. We're glad to have you exploring our site!</p>
+            <p>Here, you'll find the detailed information you expect from our platform. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nisl eros, pulvinar facilisis justo mollis, auctor consequat urna.</p>
+            <p>Thank you for your continued engagement!</p>
+        </div>
+
+        <div id="social-exclusive-content" class="content-block hidden">
+            <h2>🌟 Exclusive Welcome! Special Content Just For You! 🌟</h2>
+            <p>Hey there! It looks like you've arrived directly or from one of our social media channels. We've got something special for you on this first visit this session!</p>
+            <p><strong>Exclusive Insight:</strong> Did you know that early birds catch the best worms? Here's a unique tip or offer related to this content that we only share with newcomers like you!</p>
+            <p>If you navigate away from this page and come back within this browser session, you'll see our standard content. To see this exclusive view again, you'd need to start a new session and arrive via a direct or social link.</p>
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <p>© <script>document.write(new Date().getFullYear())</script> XYZ.com - All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userContentDiv = document.getElementById('user-content');
+            const socialExclusiveContentDiv = document.getElementById('social-exclusive-content');
+
+            // --- Configuration ---
+            // This script uses window.location.hostname.
+            // For local testing (file:///), hostname is empty.
+            // For server testing (http://localhost), hostname is 'localhost'.
+            // When deployed (https://xyz.com), hostname is 'xyz.com'.
+            const siteHost = window.location.hostname;
+            const sessionStorageKey = 'myApp_hasSeenExclusiveV2'; // Use a unique key
+            // --- End Configuration ---
+
+            const referrer = document.referrer;
+            const hasSeenExclusiveInSession = sessionStorage.getItem(sessionStorageKey) === 'true';
+
+            // For debugging:
+            // console.log("Current Host:", siteHost || "N/A (likely file:///)");
+            // console.log("Referrer:", referrer || "N/A (empty)");
+            // console.log("Has seen exclusive in session:", hasSeenExclusiveInSession);
+
+            function showUserContent() {
+                userContentDiv.classList.remove('hidden');
+                socialExclusiveContentDiv.classList.add('hidden');
+                // console.log("Showing USER (Normal) Content.");
+            }
+
+            function showSocialExclusiveContent() {
+                socialExclusiveContentDiv.classList.remove('hidden');
+                userContentDiv.classList.add('hidden');
+                sessionStorage.setItem(sessionStorageKey, 'true');
+                // console.log("Showing SOCIAL/EXCLUSIVE Content and setting session flag.");
+            }
+
+            if (hasSeenExclusiveInSession) {
+                // If they've already seen the exclusive content in this session,
+                // always show the normal user content, regardless of how they arrived this time.
+                showUserContent();
+            } else {
+                let referrerHost = '';
+                if (referrer) {
+                    try {
+                        // This will correctly parse hosts from http/https URLs.
+                        // For file:/// URLs, new URL(referrer).hostname will be an empty string.
+                        referrerHost = new URL(referrer).hostname;
+                    } catch (e) {
+                        // console.warn("Could not parse referrer URL:", referrer, e);
+                        // Treat as external or non-standard if referrer is malformed.
+                        referrerHost = 'invalid_referrer_host';
+                    }
+                }
+                // console.log("Parsed Referrer Host:", referrerHost || "N/A (empty or file:///)");
+
+                // Show exclusive content if:
+                // 1. No referrer (direct type-in, bookmark, first load for file:/// protocol).
+                // 2. Referrer's host is different from the site's host (e.g., social media, another website).
+                //    - For file:/// protocol: siteHost is '', referrerHost (from another local file) is ''.
+                //      So, `referrerHost !== siteHost` ('' !== '') is false. This is correct for local file navigation.
+                //    - For file:/// direct open: referrer is '', so `referrer === ''` is true. Correct.
+                if (referrer === '' || referrerHost !== siteHost) {
+                    showSocialExclusiveContent();
+                } else {
+                    // Referrer is present and from the same site (siteHost).
+                    showUserContent();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
